@@ -18,28 +18,28 @@ def top_ten(subreddit):
     Returns:
         None. Prints each post title on a new line, or prints None on error.
     """
-    url = (
-        "https://api.reddit.com/r/{}/hot?limit=10".format(subreddit)
-    )
-    headers = {"User-Agent": "Mozilla/5.0"}
-    try:
-        response = requests.get(
-            url,
-            headers=headers,
-            allow_redirects=False,
-            timeout=10
-        )
-    except requests.RequestException:
+    if not subreddit or not isinstance(subreddit, str):
         print(None)
         return
 
+    url = (
+        "https://www.reddit.com/r/{}/hot.json?limit=10"
+        .format(subreddit)
+    )
+    headers = {"User-Agent": "HolbertonSchool"}
+
+    response = requests.get(
+        url,
+        headers=headers,
+        allow_redirects=False
+    )
     if response.status_code != 200:
         print(None)
         return
 
-    try:
-        posts = response.json()["data"]["children"]
-    except (KeyError, ValueError):
+    data = response.json().get("data", {})
+    posts = data.get("children", [])
+    if not posts:
         print(None)
         return
 
